@@ -23,11 +23,6 @@ jobs:
 
       - uses: cachix/install-nix-action@448cde739abec1eaf0646249e3d25bb8d9bc7702 # v31
 
-      - uses: cachix/cachix-action@ad2ddac53f961de1989924296a1f236fcfbaa4fc # v15
-        with:
-          name: atomic-235
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-
       - name: Resolve latest upstream release
         id: latest
         env:
@@ -67,12 +62,6 @@ jobs:
       - name: Build
         if: steps.hashes.outputs.publish == 'true'
         run: nix build --no-link .#default
-
-      # Publish the store path before moving any ref, so the tagged commit is
-      # always substitutable.
-      - name: Push to cache
-        if: steps.hashes.outputs.publish == 'true'
-        run: cachix push atomic-235 "$(nix build --no-link --print-out-paths .#default)"
 
       - name: Commit and tag
         if: steps.hashes.outputs.publish == 'true'
